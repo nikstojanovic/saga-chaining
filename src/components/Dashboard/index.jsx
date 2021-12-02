@@ -1,28 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { getFirst } from "../../redux/actions/first";
 import { clearStatuses } from "../../redux/actions/clearStatuses";
 import Semaphore from "../Semaphore";
 import OrderTable from "../OrderTable";
-
-const DEFAULT_SERVER = "https://jsonplaceholder.typicode.com/users";
-const MIN_API_CALLS = 10;
-const MAX_API_CALLS = 100;
+import Input from '../Input';
+import { apiCallsInit } from "./helpers";
+import { DEFAULT_SERVER, MIN_API_CALLS, MAX_API_CALLS, API_INPUT_PROPS, NUMBER_INPUT_PROPS } from './constants';
 
 const Dashboard = () => {
   const [trigger, setTrigger] = useState();
   const [apiUrl, setApiUrl] = useState(DEFAULT_SERVER);
   const [noOfApiCalls, setNoOfApiCalls] = useState(MAX_API_CALLS);
   const dispatch = useDispatch();
-
-  const apiCallArray = [...new Array(noOfApiCalls)].map((el, index) => ({
-    id: index + 1,
-    url: apiUrl
-  }));
+  let apiCallArray = useRef(apiCallsInit(MAX_API_CALLS, DEFAULT_SERVER));
 
   useEffect(() => {
+    apiCallArray.current = apiCallsInit(noOfApiCalls, apiUrl);
+  }, [noOfApiCalls]);
+  
+  useEffect(() => {
     dispatch(clearStatuses());
-    apiCallArray.forEach((apiCall) => dispatch(getFirst(apiCall)));
+    apiCallArray?.current?.forEach((apiCall) => setTimeout(() => dispatch(getFirst(apiCall))), 0);
   }, [trigger]);
 
   const triggerFetch = () => {
@@ -40,31 +39,20 @@ const Dashboard = () => {
     <>
       <OrderTable />
       <h1>saga async testing dashboard</h1>
-      <div>
-        API endpoint:&nbsp;
-        <input
-          type="text"
-          placeholder={`API endpoint, ex. ${DEFAULT_SERVER}`}
-          value={apiUrl}
-          onChange={(e) => setApiUrl(e.target.value)}
-          style={{ width: "400px" }}
-        ></input>
-      </div>
-      <div>
-        No of API calls [min 10, max 100]:&nbsp;
-        <input
-          type="number"
-          min={MIN_API_CALLS}
-          max={MAX_API_CALLS}
-          placeholder="Number of API calls"
-          value={noOfApiCalls}
-          onChange={handleNoCalls}
-        ></input>
-      </div>
+      <Input
+        {...API_INPUT_PROPS}
+        value={apiUrl}
+        onChange={(e) => setApiUrl(e.target.value)}
+      />
+      <Input
+        {...NUMBER_INPUT_PROPS}
+        value={noOfApiCalls}
+        onChange={handleNoCalls}
+      />
       <div>
         <button onClick={triggerFetch}>trigger fetch</button>
       </div>
-      {apiCallArray.map((apiCall, idx) => (
+      {apiCallArray?.current?.map((apiCall, idx) => (
         <Semaphore key={idx} id={apiCall.id} maxId={noOfApiCalls.toString()} />
       ))}
     </>
