@@ -1,70 +1,38 @@
-# Getting Started with Create React App
+# React Saga async chaining 02-12-2021
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Use case
 
-## Available Scripts
+Uploading images to Amazon S3 may have the following <span style="color: red">flow</span>:
+- get `CREDENTIALS` from authorization server
+- `UPLOAD` data to Amazon S3
+- `CONFIRM` that uploads were successful
 
-In the project directory, you can run:
+Let's say you are creating React file upload component. It'll show files and their upload statuses. Files that have failed in any of the upload stages (getting credentials, uploading, upload confirmation) may be reuploaded. If you have 3 files, you'd like to try to upload them simultaneously, so you'll trigger Sagas with some sort of loop. Receiving responses should also be async. Instead of having to wait for the three stage process to end for every single file, you trigger first request for 3 files at the same time, then receive their responses as they are resolved, and trigger other requests related to the first request.
 
-### `npm start`
+Every <span style="color: red">flow</span> has a unique ID. In this case, IDs are just numbers. That way once async action is resolved (or failed) we know how to save that info.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Example of single file flow with three stages:
+1. get `CREDENTIALS` for file upload of first file (id: 1)
+2. `UPLOAD` first file to Amazon S3 (id: 1)
+3. `CONFIRM` first file upload (id: 1)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Real case example, three files flow with three stages:
+1. Saga 1: trigger get `CREDENTIALS` for files with IDs 1, 2 and 3
+2. Saga 1: you recieve `CREDENTIALS` for files with IDs 1, 2 and 3 but async in different order 3, 1 and 2
+3. Saga 2: start `UPLOAD`ing files in 3, 1, 2 order, they are of different size and their upload will resolve asynchronously
+4. Saga 2: file 1 was the smallest and it already `UPLOAD`ed no matter that his uploading action was triggered second
+5. Saga 3: `CONFIRM` upload of file 1
+6. Saga 2: files 2 and 3 were of similar size, now their `UPLOAD` is resolved
+7. Saga 3: `CONFIRM` upload of file 2
+8. Saga 3: `CONFIRM` upload of file 3
 
-### `npm test`
+## Current implementation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Install packages:
+> npm install
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+... then run the app:
+> npm start
