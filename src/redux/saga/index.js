@@ -1,10 +1,10 @@
 import { all } from "redux-saga/effects";
-import firstSaga from "./firstSaga";
-import secondSaga from "./secondSaga";
+import createFileSaga from "./createFile";
+import uploadFileSaga from "./uploadFile";
 
 export default function* rootSaga() {
   yield all([
-    firstSaga(),
-    secondSaga()
+    createFileSaga(),
+    uploadFileSaga()
   ]);
 }

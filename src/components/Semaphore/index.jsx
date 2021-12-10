@@ -10,7 +10,7 @@ const Semaphore = ({ id, maxId }) => {
 
   return (
     <div className="semaphore">
-      <span style={{ width: `${maxId.length * 12}px` }}>{id}</span>
+      <span style={{ width: `${maxId * 12}px` }}>{id}</span>
       <Indicator status={!!first} />
       <Indicator status={!!second} />
     </div>

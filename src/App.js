@@ -1,11 +1,11 @@
 import React from "react";
-import Dashboard from "./components/Dashboard";
+import GoogleDrive from "./components/GoogleDrive";
 import "./App.css";
 
 const App = () => {
   return (
     <div className="App">
-      <Dashboard />
+      <GoogleDrive />
     </div>
   );
 }
