@@ -1,0 +1,22 @@
+.file-upload {
+    border: 1px solid lightgrey;
+    width: 250px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.file-upload__input-wrapper {
+    position: relative;
+}
+
+.file-upload__input {
+    width: 100%;
+}
+
+.file-upload__input-label {
+    cursor: pointer;
+}
+
+.file-upload__input-label:hover {
+    color: red;
+}

@@ -23,16 +23,16 @@ Let's say you are creating React file upload component. It'll show files and the
 Every <mark>flow</mark> has a unique ID. In this case, IDs are just numbers. That way once async action is resolved (or failed) we know how to save that info.
 
 Real case example, three file flows in two stages:
-1. Create File Saga: trigger `CREATE` request for three files with IDs 0 (1kB), 1 (12MB) and 2 (1kB)
-2. Create File Saga: you receive success response for `CREATE` action, but async, in different order 1, 2 and 0
-3. Upload File Saga: start `UPLOAD`ing files in 1, 2, 0 order, they are of different size and their upload will resolve asynchronously
-4. Upload File Saga: files 0 and 2 are super small and their `UPLOAD` resolves almost instantly
-5. Upload File Saga: we store information that files 0 and 2 have both stages successfull and that have been uploaded
-6. Upload File Saga: file 1 `UPLOAD` is resolved after several seconds and status is saved in store<br><br>
+1. Create File Saga: trigger `CREATE` request for three files with IDs 1 (1kB), 2 (12MB) and 3 (1kB)
+2. Create File Saga: you receive success response for `CREATE` action, but async, in different order 2, 3 and 1
+3. Upload File Saga: start `UPLOAD`ing files in 2, 3, 1 order, they are of different size and their upload will resolve asynchronously
+4. Upload File Saga: files 1 and 3 are super small and their `UPLOAD` resolves almost instantly
+5. Upload File Saga: we store information that files 1 and 3 have both stages successfull and that have been uploaded
+6. Upload File Saga: file 2 `UPLOAD` is resolved after several seconds and status is saved in store<br><br>
 
 ## Current implementation
 
-When request is resolved, it will be shown above "Google Drive API test" heading. This is just an indicator of order of execution.
+When request is resolved, it will be shown below file upload component. This is just an indicator of order of execution.
 Next to file upload input field, several indicators will appear. They show stages of file upload, first indicator is related to file creation, second one is for file upload. They are red if pending or unsuccessfull and green if they are successfull.<br><br>
 
 ## Special note

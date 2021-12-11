@@ -1,5 +1,21 @@
 .semaphore {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    margin: 10px;
+    justify-content: space-between;
+    margin: 10px 0;
+}
+
+.semaphore:last-child {
+    margin-bottom: 0;
+}
+
+.semaphore__file-name {
+    max-width: calc(100% - 48px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.semaphore__indicator-wrapper {
+    display: flex;
 }

@@ -4,8 +4,8 @@ import * as actionType from "../types";
 function* createFileSaga(action) {
   const { file, id } = action.payload;
   try {
-    const post = yield fork(createFile, file);
-    const res = yield join(post);
+    const req = yield fork(createFileAPI, file);
+    const res = yield join(req);
     yield put({ type: actionType.SET_STATUS_SUCCESS, payload: { data: { first: true }, id } });
     yield put({ type: actionType.CREATE_FILE_SUCCESS, payload: { data: { file, createdData: res.result }, id }});
   } catch (e) {
@@ -13,7 +13,7 @@ function* createFileSaga(action) {
   }
 }
 
-const createFile = (file) => {
+const createFileAPI = (file) => {
   const contentType = file.type || "application/octet-stream";
 
   return window.gapi.client
@@ -34,8 +34,8 @@ const createFile = (file) => {
     })
 }
 
-function* firstSaga() {
+function* createFile() {
   yield takeEvery(actionType.CREATE_FILE_REQUESTED, createFileSaga);
 }
 
-export default firstSaga;
+export default createFile;

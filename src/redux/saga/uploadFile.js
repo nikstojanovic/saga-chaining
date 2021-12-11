@@ -4,15 +4,15 @@ import * as actionType from "../types";
 function* uploadFileSaga(action) {
   const { data, id } = action.payload;
   try {
-    const post = yield fork(uploadFile, data);
-    yield join(post);
+    const req = yield fork(uploadFileAPI, data);
+    yield join(req);
     yield put({ type: actionType.SET_STATUS_SUCCESS, payload: { data: { second: true }, id } });
   } catch (e) {
     yield put({ type: actionType.UPLOAD_FILE_FAILED, message: e.message });
   }
 }
 
-const uploadFile = (createdFileData) => {
+const uploadFileAPI = (createdFileData) => {
   const contentType = createdFileData.createdData.mimeType || "application/octet-stream";
 
   // note the difference, file update is API V2 and file creation is API V3
@@ -54,8 +54,8 @@ const uploadFile = (createdFileData) => {
     };
 })};
 
-function* secondSaga() {
+function* uploadFile() {
   yield takeEvery(actionType.CREATE_FILE_SUCCESS, uploadFileSaga);
 }
 
-export default secondSaga;
+export default uploadFile;
